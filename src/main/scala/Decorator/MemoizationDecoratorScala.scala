@@ -1,15 +1,13 @@
 package Decorator
 
-import java.util.Map
+import java.util
 import java.util.function.Function
 
 /**
  * Class representing a decorator for memoization.
  *
- * @param <I> Type of input data for the function.
- * @param <O> Type of output data for the function.
- */
-class MemoizationDecorator[I, O](cache: Map[String, O], function: Function[I, O]) extends Function[I, O] {
+ * */
+class MemoizationDecoratorScala[I, O](cache: util.Map[String, O], function: Function[I, O]) extends Function[I, O] {
 
   /**
    * Applies the memoization decorator.
@@ -28,7 +26,6 @@ class MemoizationDecorator[I, O](cache: Map[String, O], function: Function[I, O]
       println(s"Result not in cache. Adding to cache: $computedResult")
       computedResult
     }
-
     result
   }
 

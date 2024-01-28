@@ -1,33 +1,33 @@
 package Decorator
 
-
-import Components.Action
-
-import java.util.function.{Function => JFunction}
+import java.util.function.Function
 
 /**
-
-Decorator.TimerDecorator class
-
-Decorator class that adds a timer to the action
-  *
-@tparam I input
-@tparam O output
-  */
-class TimerDecoratorScala[I, O] extends Action[I, O] {
+ * TimerDecorator class
+ * Decorator class that adds a timer to the action
+ *
+ * @tparam I input
+ * @tparam O output
+ */
+class TimerDecoratorScala[I, O](function: Function[I, O]) extends Function[I, O] {
 
   /**
+   * apply method
+   * Applies the action and prints the time it took to execute
+   *
+   * @param input the input to the action
+   * @return the result of the action
+   */
+  def apply(input: I): O = {
+    val startTime = System.currentTimeMillis()
 
-  apply method
-    Applies the action and prints the time it took to execute*
-  @param function the action to be applied
-  @param input    the input to the action
-    */
-  override def apply(function: JFunction[I, O], input: I): Unit = {
-    val startTime = System.currentTimeMillis()// invoke the action
-    function.apply(input)
+    val result = function.apply(input)
 
     val endTime = System.currentTimeMillis()
     val duration = endTime - startTime
-    println(s"Total execution time: $duration milliseconds")}
+
+    println(s"Total execution time: $duration milliseconds")
+    result
+  }
+
 }

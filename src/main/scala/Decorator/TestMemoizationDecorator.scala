@@ -2,39 +2,31 @@ package Decorator
 
 import Components.Controller
 
-import java.util.function.{ Function => JFunction }
-import scala.jdk.FunctionConverters._
-import scala.jdk.javaapi.FunctionConverters.asJavaFunction
+import java.util.function.{Function => JFunction}
 
 object TestMemoizationDecorator extends App {
 
-  val controller = new Controller[Int, String](1)
-  val cache = scala.collection.mutable.Map[String, Any]()
+  val controller = new Controller[Map[String, Int], Int]()
 
-  // Using FunctionConverter to create a JFunction
-  val sleepF: JFunction[Map[String, Int], Int] =
-    asJavaFunction((args: Map[String, Int]) => {
-      val x = args.getOrElse("x", 0)
-      val y = args.getOrElse("y", 0)
-      x + y
-    })
-
-  // Register the sleep function with memoization and a specific amount of RAM
-  val sleep1: MemoizationDecorator[Map[String, Int], Any] =
-    new MemoizationDecorator(controller.getInvoker(0).getCache(), sleepF)
+  val sleepFunction: JFunction[Map[String, Int], Int] = (args: Map[String, Int]) => {
+    var x = args.getOrElse("x", 0)
+    for (i <- 1 to 1000000000) {
+      x = 1 + i
+    }
+    val y = args.getOrElse("y", 0)
+    x + y
+  }
 
   // Define a Scala Function
-  val sleep1Function: Function[Int, String] = (value: Int) => sleep1.apply(Map("x" -> value)).toString
-
-  // Convert the Scala Function to a Java Function
-  val sleep1JavaFunction: JFunction[Int, String] = asJavaFunction(sleep1Function)
+  private val memoizationDecorator = new MemoizationDecoratorScala[Map[String, Int], Int](controller.getInvoker(0).getCache, sleepFunction)
 
   // Register the Java Function with the controller
-  controller.registerAction("sleep1", sleep1JavaFunction)
+  controller.registerAction2("printAny", memoizationDecorator, 150)
 
   // Execute the function
-  controller.invoke("printAny", 3)
-  controller.invoke("printAny", 5)
-  controller.invoke("printAny", 5)
-  controller.invoke("printAny", 3)
+  controller.invoke("printAny", Map("x" -> 10, "y" -> 5))
+  controller.invoke("printAny", Map("x" -> 10, "y" -> 5))
+  controller.invoke("printAny", Map("x" -> 10, "y" -> 7))
+  controller.invoke("printAny", Map("x" -> 10, "y" -> 5))
+  controller.invoke("printAny", Map("x" -> 10, "y" -> 7))
 }
