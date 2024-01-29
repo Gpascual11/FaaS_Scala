@@ -49,7 +49,7 @@ public class TestMapReduce {
             Map<String, Integer> countWordsResult = CountWords.countWordsMap(textFromFile);
             System.out.println("CountWords per a " + filePath + ": " + countWordsResult);
 
-            String targetWord = "mushroom";
+            String targetWord = "how";
             int totalWordCount = TestMapReduce.reduce(new Map[]{wordCountResult, countWordsResult}, targetWord);
             System.out.println("Total of the word '" + targetWord + "' for " + filePath + ": " + totalWordCount);
         }

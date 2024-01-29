@@ -5,7 +5,9 @@ import Observer.MetricsObserver;
 import PolicyManager.Policy;
 import PolicyManager.PolicyManager;
 import PolicyManager.RoundRobinPolicy;
+import Reflection.DynamicProxy;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -191,7 +193,7 @@ public class Controller <I, O> implements MetricsObserver {
      * @throws IllegalArgumentException If the specified function is not found.
      * @throws IllegalStateException    If there is not enough available memory in any of the invokers.
      */
-    public List<Object> invoke2(String name, List<I> inputList) {
+    public List<Object> invoke(String name, List<I> inputList) {
         if (functionMap.containsKey(name)) {
             Function<I, O> function = functionMap.get(name);
             int ram = ramMap.getOrDefault(name, 1);
@@ -280,7 +282,7 @@ public class Controller <I, O> implements MetricsObserver {
      * @throws IllegalArgumentException If the specified function is not found.
      * @throws IllegalStateException    If there is not enough available memory in any of the invokers.
      */
-    public List<Future<O>> invokeAsync2(String name, List<I> inputList) {
+    public List<Future<O>> invokeAsync(String name, List<I> inputList) {
         if (functionMap.containsKey(name)) {
             Function<I, O> function = functionMap.get(name);
             List<Future<O>> futures = new ArrayList<>();
@@ -364,6 +366,7 @@ public class Controller <I, O> implements MetricsObserver {
      * Method to use the policy manager to assign functions to invokers.
      *
      * @param policy Policy to be used by the policy manager.
+     * @param functionsToAssign List of functions to assign.
      * @return List of invokers with assigned functions.
      */
     public List<Invoker<I, O>> usePolicyManager(Policy<I, O> policy, List<String> functionsToAssign) {
@@ -568,5 +571,21 @@ public class Controller <I, O> implements MetricsObserver {
     public  Map<String, Integer> getRamMap() {
         return this.ramMap;
     }
+
+
+    /**
+     * Method to create proxy
+     * @param target target object
+     * @return proxy object of the target
+     */
+    public Object createProxy(Object target){
+        Class targetClass = target.getClass();
+        Class[] interfaces = targetClass.getInterfaces();
+
+        DynamicProxy proxy = new DynamicProxy(target, this);
+        return Proxy.newProxyInstance(targetClass.getClassLoader(), interfaces, proxy);
+    }
+
+
 }
 

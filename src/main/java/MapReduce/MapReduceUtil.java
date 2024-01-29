@@ -1,8 +1,8 @@
 package MapReduce;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Utility class for MapReduce.
@@ -16,17 +16,11 @@ public class MapReduceUtil {
      * @return The text from the file.
      */
     public static String readTextFromFile(String filePath) {
-        StringBuilder text = new StringBuilder();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                text.append(line).append(" ");
-            }
+        try {
+            return new String(Files.readAllBytes(Paths.get(filePath)));
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
         }
-
-        return text.toString();
     }
 }
